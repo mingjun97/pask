@@ -6,6 +6,7 @@ from time import time
 from config import secret
 from base64 import b64encode
 from functionality.account import login, register, change_password
+from functionality.character import send_move_operation
 import logging
 
 def generate_return(code, **kwargs):
@@ -53,7 +54,7 @@ def vilidate(token):
 def generate_token(account):
     logging.debug("Generate token for %s" % account)
     m = hashlib.sha256()
-    timestamp = time() + 60 * 10
+    timestamp = time() + 60 * 10000
     m.update(account.encode('utf-8'))
     m.update(str(timestamp).encode('utf-8'))
     m.update(secret.encode('utf-8'))
@@ -90,17 +91,26 @@ def handler(event, context):
         if event['op'] == 'new_password':
             return new_password(event)
 
+        # Authentication
         if ('token' not in event or not vilidate(event['token'])):
             return generate_return(401)
+        account = event['token'].split(':')[0]
+        # Operations
+        if event['op'] == 'move':
+            if send_move_operation(account, event['target']):
+                return generate_return(200, tips='yes')
+            else:
+                raise Exception("Move failed")
     except:
         pass
     return generate_return(404)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    print(handler({"token": "test1:1558908258.354367:wpFt5sDPiNkLgHde8FrAmW2IeINEsaUx0YIc+fhNygI=", 'op': ''}, ""))
+    # print(handler({"token": "test1:1558908258.354367:wpFt5sDPiNkLgHde8FrAmW2IeINEsaUx0YIc+fhNygI=", 'op': ''}, ""))
     # print(handler({"token": "test:1558903983.5422819:GLJuIJvV8fdnPUpoFEXu9sotdp2Rt5PC/CO/+tJWBIQ=", 'op': 'login', 'account': 'test', 'password': 'test'}, ""))
     # print(handler({'op': 'new_password', 'account': 'test1', 'password': 'bar', 'new_password': 'for'}, ""))
     # print(handler({'op': 'login', 'account': 'test1', 'password': 'for'}, ""))
+    print(handler({'op': 'move','token': 'test1:1559604108.9599721:07poI0548rLy/CO/2dGNrpwvUaspZ2+xJiFB881pX0M=', 'target': [0,0]}, ""))
 
     # print(generate_token('test'))
