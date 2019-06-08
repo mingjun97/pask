@@ -1,5 +1,6 @@
 from .helper import get_by_account, create_account, update_by_account
 import logging
+from random import randint
 
 def login(account, password):
     account = get_by_account(account)
@@ -15,7 +16,7 @@ def register(account, password):
         account = get_by_account(account)
         return False
     except:
-        create_account(account, password=password)
+        create_account(account, password=password, position=[randint(0,500), randint(0, 500)])
         return True
 
 def change_password(account, password, new_password):

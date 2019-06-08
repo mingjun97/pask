@@ -6,7 +6,7 @@ from time import time
 from config import secret
 from base64 import b64encode
 from functionality.account import login, register, change_password
-from functionality.character import send_move_operation
+from functionality.character import send_move_operation, get_position
 import logging
 
 def generate_return(code, **kwargs):
@@ -82,6 +82,13 @@ def new_password(event):
     except:
         return generate_return(403)
 
+def whoami(event):
+    if vilidate(event['token']):
+        account = event['token'].split(':')[0]
+        return generate_return(200, account=account, position=get_position(account))
+    else:
+        return generate_return(401)
+
 def handler(event, context):
     try:
         if event['op'] == 'login':
@@ -90,7 +97,6 @@ def handler(event, context):
             return try_register(event)
         if event['op'] == 'new_password':
             return new_password(event)
-
         # Authentication
         if ('token' not in event or not vilidate(event['token'])):
             return generate_return(401)
@@ -101,6 +107,8 @@ def handler(event, context):
                 return generate_return(200, tips='yes')
             else:
                 raise Exception("Move failed")
+        if event['op'] == 'whoami':
+            return whoami(event)
     except:
         pass
     return generate_return(404)
@@ -111,6 +119,8 @@ if __name__ == "__main__":
     # print(handler({"token": "test:1558903983.5422819:GLJuIJvV8fdnPUpoFEXu9sotdp2Rt5PC/CO/+tJWBIQ=", 'op': 'login', 'account': 'test', 'password': 'test'}, ""))
     # print(handler({'op': 'new_password', 'account': 'test1', 'password': 'bar', 'new_password': 'for'}, ""))
     # print(handler({'op': 'login', 'account': 'test1', 'password': 'for'}, ""))
-    print(handler({'op': 'move','token': 'test1:1559604108.9599721:07poI0548rLy/CO/2dGNrpwvUaspZ2+xJiFB881pX0M=', 'target': [0,0]}, ""))
+    # print(handler({'op': 'register', 'account': 'testxx', 'password': 'testxx'}, ""))
+    # print(handler({'op': 'move','token': 'test1:1559604108.9599721:07poI0548rLy/CO/2dGNrpwvUaspZ2+xJiFB881pX0M=', 'target': [0,0]}, ""))
+    print(handler({'op': 'whoami','token': 'test1:1560635062.873172:HN/qizpB5ljwUgB9Se1bGxRu5QXEA2r1sAZdYWRQhbY='}, ""))
 
     # print(generate_token('test'))
