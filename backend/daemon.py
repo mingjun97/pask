@@ -3,6 +3,8 @@ from flask_socketio import SocketIO, emit, rooms
 from config import secret
 from random import randint
 from threading import Thread
+from uuid import uuid4
+from time import sleep
 
 db = dict()
 sessions = dict()
@@ -37,11 +39,27 @@ def register(data):
 
 @socketio.on('move', namespace='/main')
 def move(data):
-    emit('move')
-    Thread(target=move_handler).start()
+    try:
+        Thread(target=move_handler, args=(sessions[rooms()[0]], data['target'])).start()
+        emit('move')
+    except:
+        pass
 
-def move_handler(account):
-    pass
+def move_handler(account,target):
+    this_thread = uuid4()
+    db[account]['processor'] = this_thread
+    position = db[account]['cposition']
+    steps = [position[0] - target[0], position[1] - target[1]]
+    length = (steps[0] ** 2 + steps[1] ** 2) ** 0.5
+    length = 0.001 if length == 0 else length
+    steps[0] = - steps[0] / length
+    steps[1] = - steps[1] / length
+    while (int(position[0]) != target[0] and int(position[1]) != target[1]) and db[account]['processor'] == this_thread:
+        position[0] += steps[0]
+        position[1] += steps[1]
+        db[account]['cposition'] = [int(position[0]), int(position[1])]
+        sleep(0.1)
+
 
 @socketio.on('whoami', namespace='/main')
 def whoami():
