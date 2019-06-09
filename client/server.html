@@ -1,10 +1,107 @@
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+        <script src="socket.io.js"></script>
+        <script> var fashion= 'server'; var backend="http://128.110.154.209:8000/main"
+                var matrixes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,18,21,24,29,42,59,73,103];
+                matrixes.reverse();
+        </script>
+        <!-- <script> var backend="http://localhost:8000/main"</script> -->
         <script src="benchmark.js"></script>
+        <style>
+        .slider {
+            -webkit-appearance: none;
+            width: 450px;
+            height: 15px;
+            border-radius: 5px;   
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%; 
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+</style>
     </head>
     <body>
-        <canvas id='stage' width="500px" height="500px">
+        <table>
+            <tbody>
+                <tr>
+                    <td style="text-align: center">
+                        <span>Stage</span> 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="border: black 2px dashed; border-radius: 10px; padding: 3px">
+                            <canvas id='stage' width="500px" height="500px">                            
+                        </div>
+                    </td>
+                </tr>
+                <tr style="text-align: center; margin-top: 10px;">
+                    <td>
+                        <span>Control</span> 
+                    </td>
+                </tr>                
+                <tr>
+                    <td>
+                        <div style="border: black 2px dashed; border-radius: 10px; padding: 3px; ">
+                            <div style="display: flex; justify-content: space-around;">
+                                <button style="background: yellow;" id='reg'>Register</button>    
+                                <button style="background: salmon;" id='log'>Login</button>
+                                <button style="background: rgb(255, 103, 111);" id='update'>Update</button>
+                                <button style="background: lightblue;" id='mov'>Move</button>  
+                                <button style="background: rgb(248, 147, 240);" id='single-player-throughput'>SPT</button>  
+                                <button style="background: rgb(192, 253, 210);" id='multiple-player-throughput'>MPT</button>  
+                            </div>
+                            <div style="text-align: center;">
+                                <span> Current clients: <span id='counts'>1</span></span>
+                                <div class="slidecontainer">
+                                        <input type="range" min="1" max="100" value="1" class="slider" id="clients">
+                                </div>
+                            </div>
+                            <div style="padding: 2px;">
+                                <br/>
+                                <input type='checkbox' id='keep-update' />
+                                <label>Keep updating clients position</label>
+                            </div>
+                        </div>
+                        <div>
+                                
+                        </div>
+                    </td>
+                </tr>
+                <tr style="text-align: center; margin-top: 10px;">
+                        <td>
+                            <span>Logs</span> 
+                        </td>
+                    </tr>   
+                <tr>
+                    <td>
+                        <div style="border: black 2px dashed; border-radius: 10px; padding: 3px; min-height: 100px; ">
+                            <span id='logs'></span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
         </canvas>
     </body>
