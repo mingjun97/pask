@@ -2,6 +2,7 @@ from flask import Flask
 from flask_socketio import SocketIO, emit, rooms
 from config import secret
 from random import randint
+from threading import Thread
 
 db = dict()
 sessions = dict()
@@ -36,7 +37,11 @@ def register(data):
 
 @socketio.on('move', namespace='/main')
 def move(data):
-    print(data)
+    emit('move')
+    Thread(target=move_handler).start()
+
+def move_handler(account):
+    pass
 
 @socketio.on('whoami', namespace='/main')
 def whoami():
@@ -47,4 +52,4 @@ def whoami():
         pass
 
 if __name__ == "__main__":
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
